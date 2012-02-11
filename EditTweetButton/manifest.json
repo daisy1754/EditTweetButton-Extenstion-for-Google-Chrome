@@ -1,0 +1,14 @@
+{
+  "name": "EditTweetButton",
+  "version": "1.0",
+  "description": "To be written",
+  "content_scripts": [
+	  {
+	    "matches": ["https://twitter.com/*"],
+	    "js": ["editButton.js"]
+	  }
+  ],
+  "page_action": {
+    "default_icon": "icon.png"
+  }
+}
