@@ -5,6 +5,7 @@
   "content_scripts": [
 	  {
 	    "matches": ["https://twitter.com/*"],
+	    "css": ["editButton.css"],
 	    "js": ["editButton.js"]
 	  }
   ],
