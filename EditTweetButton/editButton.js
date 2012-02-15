@@ -29,7 +29,7 @@ function displayEditButton(event) {
 	if (!tweetDiv.editButton) {
 		var editButton = document.createElement('span');
 		editButton.innerHTML = 'edit';
-		addEventListener(editButton, displayEditTweetWindow, false);
+		editButton.addEventListener('click', displayEditTweetWindow, false);
 		tweetDiv.appendChild(editButton);
 		tweetDiv.editButton = editButton;
 	} else {
@@ -70,25 +70,31 @@ function createEditButton() {
  */
 function displayEditTweetWindow() {
 	var editWindow = document.createElement('div');
+	var editWindowTitle = document.createElement('div');
 	var editTextBox = document.createElement('input');
 	var buttons = document.createElement('div');
 	var doEditButton = document.createElement('button');
 	var doCancelButton = document.createElement('button');
-
+	
+	editWindowTitle.innerText = 'edit tweet';
 	doEditButton.addEventListener('click', editTweet, false);
 	doCancelButton.addEventListener('click', cancelEditTweet, false);
+	doEditButton.innerText = 'edit';
+	doCancelButton.innerText = 'cancel';
 	
+	editWindowTitle.id = 'editWindowTitle';
 	editWindow.id = EDIT_WINDOW_ID;
 	editTextBox.id = EDIT_TEXT_ID;
 	
 	// TODO 
-	editWindow.setAttribute(kEY_TO_ORIGINAL_TWEET, 'original');
+	editWindow.setAttribute(KEY_TO_ORIGINAL_TWEET, 'original');
 	
+	editWindow.appendChild(editWindowTitle);
 	editWindow.appendChild(editTextBox);
 	buttons.appendChild(doEditButton);
 	buttons.appendChild(doCancelButton);
 	editWindow.appendChild(buttons);
-	console.log('add');
+	document.body.appendChild(editWindow);
 }
 
 /**
