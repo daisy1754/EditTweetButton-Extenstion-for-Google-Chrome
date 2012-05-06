@@ -4,10 +4,10 @@
   "description": "To be written",
   "content_scripts": [
 	  {
-	    "matches": ["https://twitter.com/*"],
+	    "matches": ["https://twitter.com/*", "http://api.twitter.com/*", "https://api.twitter.com/*"],
 	    "css": ["editButton.css"],
-	    "js": ["lib/jsOAuth-1.3.3.min.js", "config.js", "oauth.js", "editButton.js"]
-	  },
+	    "js": ["lib/jsOAuth-1.3.4.js", "util.js", "config.js", "oauth.js", "editButton.js"]
+	  }
   ],
   "page_action": {
     "default_icon": "icon.png"

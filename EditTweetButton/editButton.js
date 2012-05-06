@@ -1,7 +1,8 @@
 const ITEMS_CONTAINER_ID = 'stream-items-id';
 const EDIT_WINDOW_TITLE_ID = 'editWindowTitle';
 const EDIT_WINDOW_ID = 'editWindow';
-const EDIT_TEXT_ID = 'editTextBox';
+const EDIT_TEXTBOX_ID = 'editTextBox';
+const EDIT_BUTTON_ID = 'editTweetButton';
 const BACKGROUND_SCREEN_ID = 'background-screen';
 const TWEET_CONTENT_CLASS_NAME = 'js-tweet-text';
 const TWEET_ITEM_TYPE_NAME = 'tweet';
@@ -9,6 +10,8 @@ const USER_NAME_ATTRIBUTE_NAME = 'data-screen-name';
 
 const KEY_TO_ORIGINAL_TWEET = 'data-original-tweet';
 const KEY_TO_TWEET_ID = 'data-item-id';
+const REQUIRE_PIN_WINDOW_TITLE_LABEL = 'input your PIN';
+const REQUIRE_PIN_BUTTON_LABEL = 'enter';
 const EDIT_WINDOW_TITLE_LABEL = 'edit tweet';
 const EDIT_BUTTON_LABEL = 'edit';
 const CANCEL_BUTTON_LABEL = 'cancel';
@@ -16,6 +19,8 @@ const CANCEL_BUTTON_LABEL = 'cancel';
 const TWEET_DESTORY_URL = 'http://twitter.com/statuses/destroy/';
 
 var editWindowCreated = false;
+var tweetIDToDelete = '';
+var editedText = '';
 init();
 
 function init() {
@@ -44,7 +49,7 @@ function displayEditButton(event) {
 	if (!tweetDiv) return;
 	
 	if (!tweetDiv.editButton) {
-		var editButton = document.createElement('span');
+		var editButton = createElement('span');
 		editButton.innerHTML = 'edit';
 		editButton.addEventListener('click', displayEditTweetWindow, false);
 		tweetDiv.appendChild(editButton);
@@ -89,31 +94,26 @@ function displayEditTweetWindow(event) {
 	var originalTweet = getTweetContent(tweetDiv);
 	var originalTweetID = tweetDiv.getAttribute(KEY_TO_TWEET_ID);
 	var editWindow = document.getElementById(EDIT_WINDOW_ID);
-	var editTextBox = document.getElementById(EDIT_TEXT_ID);
+	var editTextBox = document.getElementById(EDIT_TEXTBOX_ID);
 	editWindow.setAttribute(KEY_TO_ORIGINAL_TWEET, originalTweet);
 	editWindow.setAttribute(KEY_TO_TWEET_ID, originalTweetID);
 	editTextBox.value = originalTweet;
 }
 
 function createEditTweetWindow() {
-	var editWindow = document.createElement('div');
-	var editWindowTitle = document.createElement('div');
-	var editTextBox = document.createElement('textarea');
-	var buttons = document.createElement('div');
-	var doEditButton = document.createElement('button');
-	var doCancelButton = document.createElement('button');
-	var backgroundScreen = document.createElement('div');
+	var editWindow = createElement('div', EDIT_WINDOW_ID);
+	var editWindowTitle = createElement('div', EDIT_WINDOW_TITLE_ID);
+	var editTextBox = createElement('textarea', EDIT_TEXTBOX_ID);
+	var buttons = createElement('div');
+	var doEditButton = createElement('button', EDIT_BUTTON_ID);
+	var doCancelButton = createElement('button');
+	var backgroundScreen = createElement('div', BACKGROUND_SCREEN_ID);
 	
 	editWindowTitle.innerText = EDIT_WINDOW_TITLE_LABEL;
 	doEditButton.addEventListener('click', editTweet, false);
 	doCancelButton.addEventListener('click', cancelEditTweet, false);
 	doEditButton.innerText = EDIT_BUTTON_LABEL;
 	doCancelButton.innerText = CANCEL_BUTTON_LABEL;
-	
-	editWindowTitle.id = EDIT_WINDOW_TITLE_ID;
-	editWindow.id = EDIT_WINDOW_ID;
-	editTextBox.id = EDIT_TEXT_ID;
-	backgroundScreen.id = BACKGROUND_SCREEN_ID;
 	
 	editWindow.appendChild(editWindowTitle);
 	editWindow.appendChild(editTextBox);
@@ -130,6 +130,35 @@ function setVisibilityOfEditTweetWindow(isVisible) {
 	document.getElementById(BACKGROUND_SCREEN_ID).style.display = displayValue;
 }
 
+function requireInputPIN() {
+	var editWindowTitle = document.getElementById(EDIT_WINDOW_TITLE_ID);
+	var editTextBox = document.getElementById(EDIT_TEXTBOX_ID);
+	var editButton = document.getElementById(EDIT_BUTTON_ID);
+	var defaultTextEditTextBox = editTextBox.value;
+	editWindowTitle.innerHTML = REQUIRE_PIN_WINDOW_TITLE_LABEL;
+	editButton.innerHTML = REQUIRE_PIN_BUTTON_LABEL;
+	editTextBox.textToPost = editTextBox.value;
+	editTextBox.value= '';
+	editButton.removeEventListener('click', editTweet, false);
+	editButton.addEventListener('click', pinInputed, false);
+}
+
+function pinInputed(event) {
+	var editTextBox = document.getElementById(EDIT_TEXTBOX_ID);
+	var pinText = editTextBox.value;
+	var editWindowTitle = document.getElementById(EDIT_WINDOW_TITLE_ID);
+	var editButton = document.getElementById(EDIT_BUTTON_ID);
+	if (!pinText || pinText == '')
+		return;
+	editWindowTitle.innerText = EDIT_WINDOW_TITLE_LABEL;
+	editButton.removeEventListener('click', editTweet, false);
+	editButton.addEventListener('click', pinInputed, false);
+	editButton.innerText = EDIT_BUTTON_LABEL;
+	editTextBox.value = editTextBox.textToPost;
+	
+	passPIN(pinText);
+}
+
 /**
  * If specified text is not same as orignal and empty,
  * 1) delete the original tweet and 2) request the post new tweet.
@@ -139,21 +168,28 @@ function editTweet(event) {
 	var tweetWindow = document.getElementById(EDIT_WINDOW_ID);
 	var originalTweet 
 		= tweetWindow.getAttribute(KEY_TO_ORIGINAL_TWEET);
-	var editedText
-		= document.getElementById(EDIT_TEXT_ID).value;
+	editedText
+		= document.getElementById(EDIT_TEXTBOX_ID).value;
 
-	if (editedText && editedText != '' && editedText != originalTweet) {
-		deleteTweet(tweetWindow.getAttribute(KEY_TO_TWEET_ID));
-		
-		console.log('submit' + editedText + '|' + originalTweet);
-	} else {
-		cancelEditTweet();
-	}
+	tweetIDToDelete = tweetWindow.getAttribute(KEY_TO_TWEET_ID);
+	authenticateAndDo(postEditedTweet);
+	
+//	if (editedText && editedText != '' && editedText != originalTweet) {
+//		deleteTweet(tweetWindow.getAttribute(KEY_TO_TWEET_ID));
+//		
+//		console.log('submit' + editedText + '|' + originalTweet);
+//	} else {
+//		cancelEditTweet();
+//	}
 }
 
-function deleteTweet(tweetID) {
-	var baseURL = TWEET_DESTORY_URL + tweetID + '.json';
-	jsonpRequest(baseURL);	
+function deleteAndPostTweet() {
+	postTweet();
+	deleteTweet(tweetIDToDelete);
+}
+
+function postEditedTweet() {
+	postAndDelete(editedText, tweetIDToDelete);
 }
 
 function cancelEditTweet() {
