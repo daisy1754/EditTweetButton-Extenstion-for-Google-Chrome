@@ -1,3 +1,10 @@
 This is a Chrome extension that add 'edit' feature on your twitter web.
 You can modify your posted tweet just click 'edit', do modification, and click 'post'.
 Without this extension, you have to copy your tweet, delete it, paste copied tweet on textbox, then modify it, click 'post'.
+
+= current status
+ - you can edit your tweet
+ - for English user, you cannot edit tweet because you input conflict with twitter shortcut command.
+
+
+This project use jsOAuth library (https://github.com/bytespider/jsOAuth) by  Rob Griffiths <rob@bytespider.eu>.
