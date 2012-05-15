@@ -1,4 +1,5 @@
 const ITEMS_CONTAINER_ID = 'stream-items-id';
+const PROFILE_PAGE_ITEMS_CONTAINER_ID = 'profile-stream-manager';
 const EDIT_WINDOW_TITLE_ID = 'editWindowTitle';
 const EDIT_WINDOW_ID = 'editWindow';
 const EDIT_TEXTBOX_ID = 'editTextBox';
@@ -26,8 +27,11 @@ var editedText = '';
 init();
 
 function init() {
-	var startTime = Date.now();
 	var streamItems = document.getElementById(ITEMS_CONTAINER_ID);
+	if (!streamItems) {
+		setTimeout(init, 500);
+		return;
+	}
 	var divs = streamItems.getElementsByTagName('div');
 
 	var userName = getUserName();
@@ -41,7 +45,6 @@ function init() {
 			}
 		}
 	}
-	console.log(Date.now() - startTime);
 }
 
 /**
