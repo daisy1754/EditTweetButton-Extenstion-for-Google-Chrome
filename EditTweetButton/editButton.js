@@ -7,6 +7,8 @@ const BACKGROUND_SCREEN_ID = 'background-screen';
 const TWEET_CONTENT_CLASS_NAME = 'js-tweet-text';
 const TWEET_ITEM_TYPE_NAME = 'tweet';
 const USER_NAME_ATTRIBUTE_NAME = 'data-screen-name';
+const DATA_NAME_ATTRIBUTE_NAME = 'data-name';
+const PROFILE_NAME = 'profile';
 
 const KEY_TO_ORIGINAL_TWEET = 'data-original-tweet';
 const KEY_TO_TWEET_ID = 'data-item-id';
@@ -24,11 +26,12 @@ var editedText = '';
 init();
 
 function init() {
+	var startTime = Date.now();
 	var streamItems = document.getElementById(ITEMS_CONTAINER_ID);
 	var divs = streamItems.getElementsByTagName('div');
 
-	// TODO getUserName if and only if userName == tweetUserName
-	var userName = 'dev_dev3'; // TODO
+	var userName = getUserName();
+	console.log(userName);
 	for (var i = 0; i < divs.length; i++) {
 		if (divs[i].getAttribute('data-item-type') == 'tweet') {
 			var tweetOwnerName = getTweetOwnerName(divs[i]);
@@ -38,6 +41,7 @@ function init() {
 			}
 		}
 	}
+	console.log(Date.now() - startTime);
 }
 
 /**
@@ -49,10 +53,18 @@ function displayEditButton(event) {
 	if (!tweetDiv) return;
 	
 	if (!tweetDiv.editButton) {
-		var editButton = createElement('span');
+		var editButton = createElement('div');
 		editButton.innerHTML = 'edit';
 		editButton.addEventListener('click', displayEditTweetWindow, false);
-		tweetDiv.appendChild(editButton);
+		var childrenDiv = tweetDiv.getElementsByTagName('div');
+		var streamItemFooter = tweetDiv;
+		for (var i = 0; i < childrenDiv.length; i++) {
+			if (childrenDiv[i].className == 'stream-item-footer') {
+				streamItemFooter = childrenDiv[i];
+			}
+		}
+//		streamItemFooter.insertBefore(editButton, streamItemFooter.firstChild);
+		streamItemFooter.appendChild(editButton);
 		tweetDiv.editButton = editButton;
 	} else {
 		tweetDiv.editButton.style.display = 'inline';
@@ -202,6 +214,28 @@ function getTweetContent(tweetDiv) {
 		if (ps[i].className == TWEET_CONTENT_CLASS_NAME)
 			return ps[i].innerHTML;
 	}
+}
+
+function getUserName() {
+	var listElements = document.getElementsByTagName('li');
+	var profileElement = undefined;
+	for (var i = 0; i < listElements.length; i++) {
+		if (listElements[i].hasAttribute(DATA_NAME_ATTRIBUTE_NAME)
+				&& listElements[i].getAttribute(DATA_NAME_ATTRIBUTE_NAME) == PROFILE_NAME) {
+			profileElement = listElements[i];
+			break;
+		}
+	}
+	if (!profileElement) 
+		return null;
+	
+	listElements = profileElement.getElementsByTagName('div');
+	for (var i = 0; i < listElements.length; i++) {
+		if (listElements[i].hasAttribute(USER_NAME_ATTRIBUTE_NAME)) {
+			return listElements[i].getAttribute(USER_NAME_ATTRIBUTE_NAME);
+		}
+	}
+	return null;
 }
 
 function getTweetOwnerName(tweetDiv) {
